@@ -26,6 +26,33 @@ def vertical_win(board, n, column, token):
             can_be_winning_move = False
     return can_be_winning_move
 
+
+def get_chip_or_none(board, column, index):
+    if column < 0 or column > len(board):
+        return None
+    if index < 0 or index > len(board[column])-1:
+        return None
+    return board[column][index]
+
+def horizontal_win(board, n, column, token):
+    if n > len(board):
+        return False
+    row = len(board[column])
+    length = 1
+    disp = -1
+    chip = get_chip_or_none(board, column + disp, row)
+    while chip == token:
+        disp -= 1
+        chip = get_chip_or_none(board, column + disp, row)
+        length += 1
+    disp = 1
+    chip = get_chip_or_none(board, column + disp, row)
+    while chip == token:
+        disp += 1
+        chip = get_chip_or_none(board, column + disp, row)
+        length += 1
+    return length >= n
+
 sample_state = {
     "team-code": "eef8976e",
     "game": "connect_more",
@@ -37,9 +64,9 @@ sample_state = {
         ["R","Y"],
         ["R"],
         [],
-        ["R",],
+        ["R"],
         ["Y","Y"],
         [],
     ]
 }
-print(vertical_win(sample_state["board"], 1, 5, "Y"))
+print(horizontal_win(sample_state["board"], 4, 2, "R"))
