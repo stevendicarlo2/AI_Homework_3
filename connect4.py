@@ -1,6 +1,8 @@
 TEAM_NAME = "team"
 MEMBERS = ["snd7nb","yq4du"]
 
+import random
+
 def get_move(state):
     cols = state["columns"]
     n = state["connect_n"]
@@ -14,8 +16,32 @@ def get_move(state):
         "team-code": team_code
     }
 
+# Win if possible. Otherwise, block opponent if possible. Otherwise, play move that will not lead to winning
+# opportunity for opponent, and won't take away a dangerous spot for opponent. If none of that is possible, just play
+# a random move.
 def get_column_move(board, n, token):
-    return 2
+    winning_moves = get_winning_moves(board, n, token)
+    if len(winning_moves) > 0:
+        return winning_moves[0]
+
+    opp_token = "R" if token == "Y" else "Y"
+    blocking_moves = get_winning_moves(board, n, opp_token)
+    if len(blocking_moves) > 0:
+        return blocking_moves[0]
+
+    losing_moves = get_losing_moves(board, n, token)
+    opp_losing_moves = get_losing_moves(board, n, opp_token)
+    move_list = []
+    for col in range(len(board)):
+        if col not in losing_moves and col not in opp_losing_moves:
+            move_list.append(col)
+
+    if len(move_list) > 0:
+        return random.choice(move_list)
+    elif len(opp_losing_moves) > 0:
+        return random.choice(opp_losing_moves)
+    else:
+        return random.choice([i for i in range(len(board))])
 
 def vertical_win(board, n, column, token):
     can_be_winning_move = True
@@ -97,14 +123,14 @@ def is_winning_move(board, n, column, token):
             diagonal_win1(board, n, column, token) or
             diagonal_win2(board, n, column, token))
 
-def winnning_moves(board, n, token):
+def get_winning_moves(board, n, token):
     moves = []
     for col in range(len(board)):
         if is_winning_move(board, n, col, token):
             moves.append(col)
     return moves
 
-def losing_moves(board, n, token):
+def get_losing_moves(board, n, token):
     temp_board = deep_copy(board)
     opp_token = "R" if token == "Y" else "Y"
     moves = []
@@ -129,11 +155,9 @@ sample_state = {
     "your-token": "R",
     "board": [
         ["R","Y"],
-        ["R","R"],
-        ["Y"],
-        ["R","Y"],
-        ["Y","Y"],
+        ["Y","R"],
         ["Y"],
     ]
 }
-print(losing_moves(sample_state["board"], 3, "Y"))
+board = sample_state["board"]
+print(get_column_move(board, 3, "R"))
