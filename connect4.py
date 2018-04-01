@@ -53,6 +53,44 @@ def horizontal_win(board, n, column, token):
         length += 1
     return length >= n
 
+def diagonal_win1(board, n, column, token):
+    if n > len(board):
+        return False
+    row = len(board[column])
+    length = 1
+    disp = -1
+    chip = get_chip_or_none(board, column + disp, row + disp)
+    while chip == token:
+        disp -= 1
+        chip = get_chip_or_none(board, column + disp, row + disp)
+        length += 1
+    disp = 1
+    chip = get_chip_or_none(board, column + disp, row + disp)
+    while chip == token:
+        disp += 1
+        chip = get_chip_or_none(board, column + disp, row + disp)
+        length += 1
+    return length >= n
+
+def diagonal_win2(board, n, column, token):
+    if n > len(board):
+        return False
+    row = len(board[column])
+    length = 1
+    disp = -1
+    chip = get_chip_or_none(board, column + disp, row - disp)
+    while chip == token:
+        disp -= 1
+        chip = get_chip_or_none(board, column + disp, row - disp)
+        length += 1
+    disp = 1
+    chip = get_chip_or_none(board, column + disp, row - disp)
+    while chip == token:
+        disp += 1
+        chip = get_chip_or_none(board, column + disp, row - disp)
+        length += 1
+    return length >= n
+
 sample_state = {
     "team-code": "eef8976e",
     "game": "connect_more",
@@ -63,10 +101,10 @@ sample_state = {
     "board": [
         ["R","Y"],
         ["R"],
-        [],
-        ["R"],
+        ["Y"],
+        ["R","Y"],
         ["Y","Y"],
-        [],
+        ["Y"],
     ]
 }
-print(horizontal_win(sample_state["board"], 4, 2, "R"))
+print(diagonal_win2(sample_state["board"], 4, 3, "Y"))
