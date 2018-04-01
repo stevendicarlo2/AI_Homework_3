@@ -16,3 +16,30 @@ def get_move(state):
 
 def get_column_move(board, n, token):
     return 2
+
+def vertical_win(board, n, column, token):
+    can_be_winning_move = True
+    if n-1 > len(board[column]):
+        return False
+    for i in range(1, n, 1):
+        if board[column][-i] != token:
+            can_be_winning_move = False
+    return can_be_winning_move
+
+sample_state = {
+    "team-code": "eef8976e",
+    "game": "connect_more",
+    "opponent-name": "mighty_ducks",
+    "columns": 6,
+    "connect_n": 5,
+    "your-token": "R",
+    "board": [
+        ["R","Y"],
+        ["R"],
+        [],
+        ["R",],
+        ["Y","Y"],
+        [],
+    ]
+}
+print(vertical_win(sample_state["board"], 1, 5, "Y"))
