@@ -28,7 +28,7 @@ def vertical_win(board, n, column, token):
 
 
 def get_chip_or_none(board, column, index):
-    if column < 0 or column > len(board):
+    if column < 0 or column > len(board)-1:
         return None
     if index < 0 or index > len(board[column])-1:
         return None
@@ -91,6 +91,35 @@ def diagonal_win2(board, n, column, token):
         length += 1
     return length >= n
 
+def is_winning_move(board, n, column, token):
+    return (vertical_win(board, n, column, token) or
+            horizontal_win(board, n, column, token) or
+            diagonal_win1(board, n, column, token) or
+            diagonal_win2(board, n, column, token))
+
+def winnning_moves(board, n, token):
+    moves = []
+    for col in range(len(board)):
+        if is_winning_move(board, n, col, token):
+            moves.append(col)
+    return moves
+
+def losing_moves(board, n, token):
+    temp_board = deep_copy(board)
+    opp_token = "R" if token == "Y" else "Y"
+    moves = []
+    for col in range(len(temp_board)):
+        temp_board[col].append(token)
+        if col > 0:
+            del temp_board[col-1][-1]
+        if is_winning_move(temp_board, n, col, opp_token):
+            moves.append(col)
+    return moves
+
+def deep_copy(board):
+    copy = [[board[x][y] for y in range(len(board[x]))] for x in range(len(board))]
+    return copy
+
 sample_state = {
     "team-code": "eef8976e",
     "game": "connect_more",
@@ -100,11 +129,11 @@ sample_state = {
     "your-token": "R",
     "board": [
         ["R","Y"],
-        ["R"],
+        ["R","R"],
         ["Y"],
         ["R","Y"],
         ["Y","Y"],
         ["Y"],
     ]
 }
-print(diagonal_win2(sample_state["board"], 4, 3, "Y"))
+print(losing_moves(sample_state["board"], 3, "Y"))
