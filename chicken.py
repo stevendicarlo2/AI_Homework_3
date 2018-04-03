@@ -29,34 +29,14 @@ def get_move(state):
 def get_time(prior_info):
     return .2
 
-def get_normal_confidence_bound(data):
+def get_upper_prediction_bound(data):
     n = len(data)
     avg = sum(data)/n
     temp = 0
     for point in data:
         temp += (point-avg)**2
     var = temp/(n-1)
-
-    chi2_table_90 = [2.706,
-                     4.605,
-                     6.251,
-                     7.779,
-                     9.236,
-                     10.645,
-                     12.017,
-                     13.362,
-                     14.684,
-                     15.987,
-                     17.275,
-                     18.549,
-                     19.812,
-                     21.064,
-                     22.307,
-                     23.542,
-                     24.769,
-                     25.989,
-                     27.204,
-                     28.412]
+    stddev = var**(1/2)
     t_table_90 = [3.08,
                   1.89,
                   1.64,
@@ -87,12 +67,9 @@ def get_normal_confidence_bound(data):
                   1.31,
                   1.31,
                   1.31]
-    sample_n = min(n, 30)
-    z_score = 1.28 if n > 31 else t_table_90[n-2]
-    var_upper_bound = var + (sample_n-1)*var/chi2_table_90[sample_n-2]
-    stddev_upper_bound = var_upper_bound**.5
-    mean_upper_bound = avg + z_score*((var/n)**.5)
-    return mean_upper_bound, stddev_upper_bound
+    t_score = 1.28 if n > 31 else t_table_90[n-2]
+    prediction_upper_bound = avg + t_score*stddev*(1+1/n)**(1/2)
+    return prediction_upper_bound
 
 def load_data():
     sample_info = {
@@ -109,5 +86,5 @@ def load_data():
 def save_data(info):
     return
 
-sample_data = [0, 1, 2, 3]
-print(get_normal_confidence_bound(sample_data))
+sample_data = [0, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 3]
+print(get_upper_prediction_bound(sample_data))
