@@ -75,8 +75,8 @@ def load_data():
     sample_info = {
         "past_reaction_times": [.1, .12, .32],
         "past_results": {
-            "opponent1": [(.1, .2, "crash"), (.1, .1, "tie"), (.2, .1, "win")],
-            "opponent2": [(.3, .3, "tie")]
+            "opponent1": [(.1, .2, -10), (.1, .1, 0), (.2, .1, -1)],
+            "opponent2": [(.3, .3, 0)]
         },
         "last_opponent": "opponent2",
         "last_submitted_time": .2
