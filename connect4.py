@@ -183,6 +183,41 @@ def diagonal_win2(board, n, column, token):
         length += 1
     return length >= n
 
+def diagonal_score2(board, n, column, token):
+    if n > len(board):
+        return 0
+    last_col = len(board)-1
+    row = len(board[column])-1
+    left_edge = column
+    disp = 0
+    while left_edge >= 0 and column - left_edge <= n-1 and (get_chip_or_none(board, left_edge, row+disp) in [token, None]):
+        left_edge -= 1
+        disp += 1
+    left_edge += 1
+    right_edge = column
+    disp = 0
+    while right_edge <= last_col and right_edge-column <= n-1 and row+disp >= 0 and (get_chip_or_none(board, right_edge, row+disp) in [token, None]):
+        right_edge += 1
+        disp -= 1
+    right_edge -= 1
+
+    if right_edge-left_edge < n-1:
+        return 0
+
+    score = 0
+    for i in range(left_edge, left_edge+n, 1):
+        if get_chip_or_none(board, i, row+column-i) == token:
+            score += 1
+    max_score = score
+    for i in range(left_edge+n, right_edge+1, 1):
+        if get_chip_or_none(board, i, row+column-i) == token:
+            score += 1
+        if get_chip_or_none(board, i-n, row+column-(i-n)) == token:
+            score -= 1
+        if score > max_score:
+            max_score = score
+    return max_score/n
+
 def is_winning_move(board, n, column, token):
     return (vertical_win(board, n, column, token) or
             horizontal_win(board, n, column, token) or
@@ -222,12 +257,12 @@ sample_state = {
     "board": [
         ["R"],
         ["Y", "R"],
-        ["Y", "Y"],
-        ["Y"],
-        ["R"],
+        ["Y", "Y", "Y", "Y"],
+        ["Y", "R"],
+        ["R", "R"],
         ["R", "R", "Y", "Y", "Y"],
         ["R", "R"]
     ]
 }
 board = sample_state["board"]
-print(diagonal_score1(board, 3, 3, "Y"))
+print(diagonal_score2(board, 4, 4, "R"))
