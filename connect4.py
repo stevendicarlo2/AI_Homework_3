@@ -30,23 +30,26 @@ def get_column_move(board, n, token):
         return blocking_moves[0]
 
     losing_moves = get_losing_moves(board, n, token)
-    opp_losing_moves = get_losing_moves(board, n, opp_token)
     move_list = []
     for col in range(len(board)):
-        if col not in losing_moves and col not in opp_losing_moves:
+        if col not in losing_moves:
             move_list.append(col)
+    if len(move_list) == 0:
+        return losing_moves[0]
 
-    if len(move_list) > 0:
-        return random.choice(move_list)
-    elif len(opp_losing_moves) > 0:
-        return random.choice(opp_losing_moves)
-    else:
-        return random.choice([i for i in range(len(board))])
+    moves_with_scores = get_scores_for_moves(board, n, token, move_list)
+    best_score = moves_with_scores[0][1]
+    best_move = moves_with_scores[0][0]
+    for move, score in moves_with_scores:
+        if score > best_score:
+            best_score = score
+            best_move = move
+    return best_move
 
 def get_scores_for_moves(board, n, token, moves):
     set_up_vert_mult = 5
     set_up_horiz_mult = 10
-    set_up_diag_mult = 15
+    set_up_diag_mult = 10
     bail_out_score = -20
     block_multiplier = 1
 
@@ -56,20 +59,21 @@ def get_scores_for_moves(board, n, token, moves):
     moves_with_scores = []
     for col in moves:
         temp_board[col].append(token)
-        own_score = set_up_vert_mult*vertical_score(board, n, col, token) + \
-            set_up_horiz_mult*horizontal_score(board, n, col, token) + \
-            set_up_diag_mult*diagonal_score1(board, n, col, token) + \
-            set_up_diag_mult*diagonal_score2(board, n, col, token)
+        own_score = set_up_vert_mult*vertical_score(temp_board, n, col, token) + \
+            set_up_horiz_mult*horizontal_score(temp_board, n, col, token) + \
+            set_up_diag_mult*diagonal_score1(temp_board, n, col, token) + \
+            set_up_diag_mult*diagonal_score2(temp_board, n, col, token)
         temp_board[col][-1] = opp_token
-        block_score = set_up_vert_mult*vertical_score(board, n, col, opp_token) + \
-            set_up_horiz_mult*horizontal_score(board, n, col, opp_token) + \
-            set_up_diag_mult*diagonal_score1(board, n, col, opp_token) + \
-            set_up_diag_mult*diagonal_score2(board, n, col, opp_token)
+        block_score = set_up_vert_mult*vertical_score(temp_board, n, col, opp_token) + \
+            set_up_horiz_mult*horizontal_score(temp_board, n, col, opp_token) + \
+            set_up_diag_mult*diagonal_score1(temp_board, n, col, opp_token) + \
+            set_up_diag_mult*diagonal_score2(temp_board, n, col, opp_token)
         block_score *= block_multiplier
         score = own_score + block_score
         if col in opp_losing_moves:
             score -= bail_out_score
         moves_with_scores.append((col, score))
+        del temp_board[col][-1]
     return moves_with_scores
 
 def vertical_win(board, n, column, token):
@@ -295,12 +299,12 @@ sample_state = {
     "board": [
         ["R"],
         ["Y", "R"],
-        ["Y", "Y", "Y", "Y"],
+        ["Y"],
         ["Y", "R"],
-        ["R", "R"],
-        ["R", "R", "Y", "Y", "Y"],
+        ["R"],
+        ["R"],
         ["R", "R"]
     ]
 }
 board = sample_state["board"]
-print(get_scores_for_moves(board, 3, "R", [0, 1, 2, 3, 4, 5, 6]))
+print(get_column_move(board, 4, "Y"))
