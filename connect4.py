@@ -52,6 +52,15 @@ def vertical_win(board, n, column, token):
             can_be_winning_move = False
     return can_be_winning_move
 
+def vertical_score(board, n, column, token):
+    row = len(board[column])-1
+    score = 0
+    for i in range(row, row-n-1, -1):
+        if get_chip_or_none(board, column, i) == token:
+            score += 1
+        else:
+            return score/n
+    return score/n
 
 def get_chip_or_none(board, column, index):
     if column < 0 or column > len(board)-1:
@@ -265,4 +274,4 @@ sample_state = {
     ]
 }
 board = sample_state["board"]
-print(diagonal_score2(board, 4, 4, "R"))
+print(vertical_score(board, 5, 2, "Y"))
