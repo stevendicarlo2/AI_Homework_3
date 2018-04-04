@@ -43,6 +43,35 @@ def get_column_move(board, n, token):
     else:
         return random.choice([i for i in range(len(board))])
 
+def get_scores_for_moves(board, n, token, moves):
+    set_up_vert_mult = 5
+    set_up_horiz_mult = 10
+    set_up_diag_mult = 15
+    bail_out_score = -20
+    block_multiplier = 1
+
+    temp_board = deep_copy(board)
+    opp_token = "R" if token == "Y" else "Y"
+    opp_losing_moves = get_losing_moves(board, n, opp_token)
+    moves_with_scores = []
+    for col in moves:
+        temp_board[col].append(token)
+        own_score = set_up_vert_mult*vertical_score(board, n, col, token) + \
+            set_up_horiz_mult*horizontal_score(board, n, col, token) + \
+            set_up_diag_mult*diagonal_score1(board, n, col, token) + \
+            set_up_diag_mult*diagonal_score2(board, n, col, token)
+        temp_board[col][-1] = opp_token
+        block_score = set_up_vert_mult*vertical_score(board, n, col, opp_token) + \
+            set_up_horiz_mult*horizontal_score(board, n, col, opp_token) + \
+            set_up_diag_mult*diagonal_score1(board, n, col, opp_token) + \
+            set_up_diag_mult*diagonal_score2(board, n, col, opp_token)
+        block_score *= block_multiplier
+        score = own_score + block_score
+        if col in opp_losing_moves:
+            score -= bail_out_score
+        moves_with_scores.append((col, score))
+    return moves_with_scores
+
 def vertical_win(board, n, column, token):
     can_be_winning_move = True
     if n-1 > len(board[column]):
@@ -274,4 +303,4 @@ sample_state = {
     ]
 }
 board = sample_state["board"]
-print(vertical_score(board, 5, 2, "Y"))
+print(get_scores_for_moves(board, 3, "R", [0, 1, 2, 3, 4, 5, 6]))
