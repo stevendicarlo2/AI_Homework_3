@@ -59,16 +59,24 @@ def get_scores_for_moves(board, n, token, moves):
     moves_with_scores = []
     for col in moves:
         temp_board[col].append(token)
-        own_score = set_up_vert_mult*vertical_score(temp_board, n, col, token) + \
-            set_up_horiz_mult*horizontal_score(temp_board, n, col, token) + \
-            set_up_diag_mult*diagonal_score1(temp_board, n, col, token) + \
-            set_up_diag_mult*diagonal_score2(temp_board, n, col, token)
+        # print(col, "vert", vertical_score(temp_board, n, col, token))
+        # print(col, "horiz", horizontal_score(temp_board, n, col, token))
+        # print(col, "diag1", diagonal_score1(temp_board, n, col, token))
+        # print(col, "diag2", diagonal_score2(temp_board, n, col, token))
+        own_score = set_up_vert_mult*vertical_score(temp_board, n, col, token)**2 + \
+            set_up_horiz_mult*horizontal_score(temp_board, n, col, token)**2 + \
+            set_up_diag_mult*diagonal_score1(temp_board, n, col, token)**2 + \
+            set_up_diag_mult*diagonal_score2(temp_board, n, col, token)**2
         temp_board[col][-1] = opp_token
-        block_score = set_up_vert_mult*vertical_score(temp_board, n, col, opp_token) + \
-            set_up_horiz_mult*horizontal_score(temp_board, n, col, opp_token) + \
-            set_up_diag_mult*diagonal_score1(temp_board, n, col, opp_token) + \
-            set_up_diag_mult*diagonal_score2(temp_board, n, col, opp_token)
+        block_score = set_up_vert_mult*vertical_score(temp_board, n, col, opp_token)**2 + \
+            set_up_horiz_mult*horizontal_score(temp_board, n, col, opp_token)**2 + \
+            set_up_diag_mult*diagonal_score1(temp_board, n, col, opp_token)**2 + \
+            set_up_diag_mult*diagonal_score2(temp_board, n, col, opp_token)**2
         block_score *= block_multiplier
+        # print(col, "opp vert", vertical_score(temp_board, n, col, opp_token))
+        # print(col, "opp horiz", horizontal_score(temp_board, n, col, opp_token))
+        # print(col, "opp diag1", diagonal_score1(temp_board, n, col, opp_token))
+        # print(col, "opp diag2", diagonal_score2(temp_board, n, col, opp_token))
         score = own_score + block_score
         if col in opp_losing_moves:
             score -= bail_out_score
@@ -142,15 +150,14 @@ def horizontal_score(board, n, column, token):
     for i in range(left_edge, left_edge+n, 1):
         if get_chip_or_none(board, i, row) == token:
             score += 1
-    max_score = score
+    sum_square_scores = (score/n)**2
     for i in range(left_edge+n, right_edge+1, 1):
         if get_chip_or_none(board, i, row) == token:
             score += 1
         if get_chip_or_none(board, i-n, row) == token:
             score -= 1
-        if score > max_score:
-            max_score = score
-    return max_score/n
+        sum_square_scores += (score/n)**2
+    return (sum_square_scores)
 
 def diagonal_win1(board, n, column, token):
     if n > len(board):
@@ -196,15 +203,14 @@ def diagonal_score1(board, n, column, token):
     for i in range(left_edge, left_edge+n, 1):
         if get_chip_or_none(board, i, row+i-column) == token:
             score += 1
-    max_score = score
+    sum_square_scores = (score/n)**2
     for i in range(left_edge+n, right_edge+1, 1):
         if get_chip_or_none(board, i, row+i-column) == token:
             score += 1
         if get_chip_or_none(board, i-n, row+(i-n)-column) == token:
             score -= 1
-        if score > max_score:
-            max_score = score
-    return max_score/n
+        sum_square_scores += (score / n) ** 2
+    return (sum_square_scores)
 
 def diagonal_win2(board, n, column, token):
     if n > len(board):
@@ -250,15 +256,14 @@ def diagonal_score2(board, n, column, token):
     for i in range(left_edge, left_edge+n, 1):
         if get_chip_or_none(board, i, row+column-i) == token:
             score += 1
-    max_score = score
+    sum_square_scores = (score/n)**2
     for i in range(left_edge+n, right_edge+1, 1):
         if get_chip_or_none(board, i, row+column-i) == token:
             score += 1
         if get_chip_or_none(board, i-n, row+column-(i-n)) == token:
             score -= 1
-        if score > max_score:
-            max_score = score
-    return max_score/n
+        sum_square_scores += (score / n) ** 2
+    return (sum_square_scores)
 
 def is_winning_move(board, n, column, token):
     return (vertical_win(board, n, column, token) or
